@@ -43,10 +43,14 @@ def predict_naive_bayes(train_data, sample, feature_names):
 
     labels = [row[-1] for row in train_data]
     label_counts = Counter(labels)
-    feature_value_counts = [
-        len(set(row[i + 1] for row in train_data))
-        for i in range(len(feature_names))
-    ]
+    
+    feature_value_counts = []
+    for i in range(len(feature_names)):
+        unique_values = set()
+        for row in train_data:
+            unique_values.add(row[i + 1])
+        count = len(unique_values)
+        feature_value_counts.append(count)
 
     classes = label_counts.keys()
 
