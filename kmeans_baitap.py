@@ -36,8 +36,11 @@ POINTS = {
 
 # prime_indices = [i for i in range(len(POINTS)) if is_prime(i)]
 # centers = [POINTS[i] for i in prime_indices[:3]]  
+
 centers = [POINTS[1], POINTS[2], POINTS[3]]
 print("Tâm ban đầu:", centers)
+
+
 
 def distance(point, center):
     """Tinh khoang cach Euclid tu mot diem den mot tam."""
@@ -63,11 +66,48 @@ def assign_clusters(points, centers):
         distances_with_index.sort(key=lambda x: x[0])
 
         # 3. Lấy phần tử ở vị trí index 1 (chính là nhỏ thứ nhì)
-        # distances_with_index[0] là nhỏ nhất, distances_with_index[1] là nhỏ thứ nhì
+        # distances_with_index[0] là nhỏ nhất, 
         second_nearest_center = distances_with_index[0][1]
 
         # 4. Gán ID của điểm vào cụm nhỏ thứ nhì đó
         clusters[second_nearest_center].append(point_id)
+
+    return clusters
+def assign_clusters_with_size_constraint(points, centers, max_cluster_size):
+    """Gán cụm có khống chế số lượng phần tử tối đa."""
+    clusters = [[] for _ in centers]
+
+    # 1. Tạo danh sách chứa tất cả các cặp (khoảng cách, point_id, cluster_id)
+    all_distances = []
+    for point_id, point in points.items():
+        for idx, center in enumerate(centers):
+            dist = distance(point, center)
+            all_distances.append((dist, point_id, idx))
+
+    # 2. Sắp xếp tất cả các cặp theo khoảng cách từ nhỏ đến lớn
+    # Thằng nào gần tâm nào nhất sẽ nhảy lên đầu danh sách để được ưu tiên gán trước
+    all_distances.sort(key=lambda x: x[0])
+
+    # Tập hợp để theo dõi xem điểm nào đã được gán vào cụm rồi
+    assigned_points = set()
+
+    # 3. Duyệt qua danh sách đã sắp xếp để gán cụm
+    for dist, point_id, cluster_id in all_distances:
+        # Nếu điểm này đã được xếp vào một cụm nào đó rồi -> Bỏ qua
+        if point_id in assigned_points:
+            continue
+
+        # Nếu cụm này vẫn chưa đầy (chưa đạt số lượng thầy quy định)
+        if len(clusters[cluster_id]) < max_cluster_size:
+            clusters[cluster_id].append(point_id)
+            assigned_points.add(point_id)
+
+        # Nếu cụm đã đầy, vòng lặp tự động bỏ qua và ở lượt sau,
+        # điểm này sẽ được xét với tâm gần tiếp theo của nó.
+
+        # Điểu kiện dừng sớm khi tất cả các điểm đã được gán xong
+        if len(assigned_points) == len(points):
+            break
 
     return clusters
 
@@ -90,7 +130,7 @@ def calculate_centers(points, clusters, old_centers):
 def kmeans(points, centers, max_iterations=100):
     """Lap hai buoc: gan cum va tinh lai tam."""
     for iteration in range(1, max_iterations + 1):
-        clusters = assign_clusters(points, centers)
+        clusters = assign_clusters_with_size_constraint(points, centers, max_cluster_size=6)
         new_centers = calculate_centers(points, clusters, centers)
 
         print(f"\nLan lap {iteration}:")
