@@ -25,17 +25,18 @@ POINTS = {
 
 # Chọn tâm trong các điểm dữ liệu ban đầu. Ở đây, tôi chọn bằng cách lấy thứ tự là số nguyên tố là nhỏ nhất.
 
-def is_prime(n):
-    """Kiểm tra số nguyên n có phải là số nguyên tố không."""
-    if n <= 1:
-        return False
-    for i in range(2, int(math.sqrt(n)) + 1):
-        if n % i == 0:
-            return False
-    return True
+# def is_prime(n):
+#     """Kiểm tra số nguyên n có phải là số nguyên tố không."""
+#     if n <= 1:
+#         return False
+#     for i in range(2, int(math.sqrt(n)) + 1):
+#         if n % i == 0:
+#             return False
+#     return True
 
-prime_indices = [i for i in range(len(POINTS)) if is_prime(i)]
-centers = [POINTS[i] for i in prime_indices[:3]]  
+# prime_indices = [i for i in range(len(POINTS)) if is_prime(i)]
+# centers = [POINTS[i] for i in prime_indices[:3]]  
+centers = [POINTS[1], POINTS[2], POINTS[3]]
 print("Tâm ban đầu:", centers)
 
 def distance(point, center):
