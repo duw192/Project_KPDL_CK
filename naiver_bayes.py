@@ -44,14 +44,6 @@ def predict_naive_bayes(train_data, sample, feature_names):
     labels = [row[-1] for row in train_data]
     label_counts = Counter(labels)
     
-    feature_value_counts = []
-    for i in range(len(feature_names)):
-        unique_values = set()
-        for row in train_data:
-            unique_values.add(row[i + 1])
-        count = len(unique_values)
-        feature_value_counts.append(count)
-
     classes = label_counts.keys()
 
     scores = {}
@@ -78,11 +70,11 @@ def predict_naive_bayes(train_data, sample, feature_names):
                 if row[i + 1] == value:
                     count_value += 1
 
-            conditional_prob = (count_value + 1) / (label_counts[c] + feature_value_counts[i])
+            conditional_prob = count_value / label_counts[c]
 
             print(
                 f"P({feature_names[i]} = {value} | {c}) "
-                f"= ({count_value} + 1)/({label_counts[c]} + {feature_value_counts[i]}) = {conditional_prob}"
+                f"= {count_value}/{label_counts[c]} = {conditional_prob}"
             )
 
             probability *= conditional_prob
