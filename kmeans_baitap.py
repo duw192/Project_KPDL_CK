@@ -23,9 +23,20 @@ POINTS = {
     17: (7, 13),
 }
 
-# Chon Node 1, 2, 3 lam ba tam ban dau.
-centers = [POINTS[1], POINTS[2], POINTS[3]]
+# Chọn tâm trong các điểm dữ liệu ban đầu. Ở đây, tôi chọn bằng cách lấy thứ tự là số nguyên tố là nhỏ nhất.
 
+def is_prime(n):
+    """Kiểm tra số nguyên n có phải là số nguyên tố không."""
+    if n <= 1:
+        return False
+    for i in range(2, int(math.sqrt(n)) + 1):
+        if n % i == 0:
+            return False
+    return True
+
+prime_indices = [i for i in range(len(POINTS)) if is_prime(i)]
+centers = [POINTS[i] for i in prime_indices[:3]]  
+print("Tâm ban đầu:", centers)
 
 def distance(point, center):
     """Tinh khoang cach Euclid tu mot diem den mot tam."""
@@ -36,16 +47,28 @@ def distance(point, center):
 
 
 def assign_clusters(points, centers):
-    """Gan moi diem vao tam gan nhat."""
+    """Gan moi diem vao tam GAN THU NHI (nho thu nhi)."""
     clusters = [[] for _ in centers]
 
     for point_id, point in points.items():
-        distances = [distance(point, center) for center in centers]
-        nearest_center = distances.index(min(distances))
-        clusters[nearest_center].append(point_id)
+        # 1. Tính khoảng cách từ điểm hiện tại tới cả 3 tâm
+        # Kết quả trả về dạng danh sách các tuple: [(khoảng_cách, vị_trí_tâm), ...]
+        distances_with_index = [
+            (distance(point, center), idx)
+            for idx, center in enumerate(centers)
+        ]
+
+        # 2. Sắp xếp danh sách theo thứ tự khoảng cách tăng dần
+        distances_with_index.sort(key=lambda x: x[0])
+
+        # 3. Lấy phần tử ở vị trí index 1 (chính là nhỏ thứ nhì)
+        # distances_with_index[0] là nhỏ nhất, distances_with_index[1] là nhỏ thứ nhì
+        second_nearest_center = distances_with_index[0][1]
+
+        # 4. Gán ID của điểm vào cụm nhỏ thứ nhì đó
+        clusters[second_nearest_center].append(point_id)
 
     return clusters
-
 
 def calculate_centers(points, clusters, old_centers):
     """Tinh tam moi bang trung binh toa do cac diem trong cum."""
